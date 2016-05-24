@@ -1,6 +1,6 @@
 (function () {
     var duck = {
-        duckSinging: function(){
+        duckSing2ing: function(){
             console.log("嘎嘎嘎");
         }
     }
