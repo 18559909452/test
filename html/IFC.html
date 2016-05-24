@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!--垂直居中布局-->
+<!--<style>
+    /* comm 核心部分 */
+    .g-ifc-wrap:after,
+    .g-ifc-wrap-after {
+        content: '';
+        height: 100%;
+        width: 0;
+        display: inline-block;
+        *display: inline;
+        *zoom: 1;
+        margin-left: -5px;
+        font-size: 0;
+        vertical-align: middle;
+    }
+
+    .g-ifc-item {
+        display: inline-block;
+        *display: inline;
+        *zoom: 1;
+        vertical-align: middle;
+    }
+
+    /* test */
+    #test {
+        height: 500px;
+        background-color: #878787;
+        border: 3px solid #526f39;
+        text-align: center;
+    }
+</style>
+<div id="test" class="g-ifc-wrap">
+    <img class="g-ifc-item" alt="我也是"
+         src="./../image/123.jpg"/>
+    &lt;!&ndash;[if lte IE 7]><span class="g-ifc-wrap-after"></span>< ![endif]&ndash;&gt;
+</div>-->
+
+
+
+<!--多列布局-->
+<style>
+    /* comm 核心部分 */
+    .g-ifc-wrap:after,
+    .g-ifc-wrap-after {
+        content: '';
+        height: 100%;
+        width: 0;
+        display: inline-block;
+        *display: inline;
+        *zoom: 1;
+        margin-left: -5px;
+        font-size: 0;
+        vertical-align: middle;
+    }
+
+    .g-ifc-item {
+        display: inline-block;
+        *display: inline;
+        *zoom: 1;
+        vertical-align: middle;
+    }
+
+    /* test */
+    #test {
+        height: 500px;
+        background-color: #878787;
+        border: 3px solid #526f39;
+        text-align: center;
+    }
+</style>
+<div id="test" class="g-ifc-wrap" style="font-size: 0;">
+    <div style="background: red; display: inline-block; height: 100px; width: 33.3%;"></div>
+    <div style="background: green; display: inline-block; height: 100px; width: 33.3%;"></div>
+    <div style="background: black; display: inline-block; height: 100px; width: 33.4%;"></div>
+    <!--[if lte IE 7]><span class="g-ifc-wrap-after"></span>< ![endif]-->
+</div>
+</body>
+</html>

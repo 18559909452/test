@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link type="text/css" rel="stylesheet"
+          href="http://test.static.huayu.nd/addins/bootstrap/v2.3.1/css/bootstrap.css?v=2016040804">
+    <link type="text/css" rel="stylesheet"
+          href="http://test.static.huayu.nd/addins/jquery/pagination/v2.2/nae/pagination.css?v=2016040804">
+    <link href="../css/test3.css" type="text/css" rel="stylesheet"/>
+    <link href="../css/x-courselist.css" type="text/css" rel="stylesheet"/>
+</head>
+<style>
+    .form-horizontal>.control-group {
+        margin-bottom: 10px;
+    }
+</style>
+<body>
+
+<a href="#myModal" role="button" class="btn" data-toggle="modal">查看演示案例</a>
+
+<!-- Modal -->
+<div id="myModal" class="modal hide fade" style="width: 880px; left: 35%;">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 style="font-size: 18px">选择课程</h3>
+    </div>
+    <div class="modal-body" style="max-height: 500px;">
+        <div class="form-horizontal">
+            <div class="control-group">
+                <label class="control-label">搜索类型：</label>
+
+                <div class="controls">
+                    <input type="text" placeholder=" 输入课程名称"/>
+                    <a class="btn btn-primary" style="margin-left: 50px">搜索</a>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">课程类型：</label>
+
+                <div class="controls">
+                    <x-navigation-button
+                            params="items:model.courseType, isMultiple: false, sizeClass: 'btn-small', colorType: 'btn-primary'">
+                        <div data-bind="foreach: model.items, visible: model.items().length>0"
+                             style="display: none;">
+                            <button data-bind="css: 'btn '+ $parent.model.sizeClass() + ' ' + (checked() ? $parent.model.colorType() : ''), text: text, click: $parent.btnClick.bind($data)"></button>
+                        </div>
+                    </x-navigation-button>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">二级分类：</label>
+
+                <div class="controls">
+                    <x-navigation-button
+                            params="items:model.secondType, isMultiple: false, sizeClass: 'btn-small', colorType: 'btn-primary'">
+                        <div data-bind="foreach: model.items, visible: model.items().length>0"
+                             style="display: none;">
+                            <button data-bind="css: 'btn '+ $parent.model.sizeClass() + ' ' + (checked() ? $parent.model.colorType() : ''), text: text, click: $parent.btnClick.bind($data)"></button>
+                        </div>
+                    </x-navigation-button>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">已选课程：</label>
+
+                <div class="controls">
+                    <x-select-optional params="items:model.selectedCourse">
+                        <ul class="x-select-optional" data-bind="foreach: model.items, visible: model.items().length>0"
+                            style="display: none;">
+                            <li><span data-bind="text: title"></span><a href="javascript:;"
+                                                                        data-bind="click: $parent.removeClick.bind($data, $index())">×</a>
+                            </li>
+                        </ul>
+                    </x-select-optional>
+                </div>
+            </div>
+            <div class="control-group" style="margin-left: 70px;">
+                <x-list-course params="items:model.CourseList, selectItems: model.selectedCourse, canChecked: true">
+                    <ul class="x-list-course" data-bind="foreach: model.items, visible: model.items().length>0"
+                        style="display: none;">
+                        <li data-bind="css:{ active: customChecked }, click: $parent.activeClick.bind($data, $index())">
+                            <i></i>
+                            <img src data-bind="attr:{'src': imgUrl }">
+
+                            <p data-bind="text:title"></p>
+                            <ul class="x-select-course-detail">
+                                <li><span data-bind="text: courseCount"></span>门课程</li>
+                                <li><span class="split">|</span></li>
+                                <li><span data-bind="text: courseHour">1</span>学时</li>
+                                <li><span class="split">|</span></li>
+                                <li><span data-bind="text: courseExam">1</span>个考试</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </x-list-course>
+                <div id="pagination">
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary">确定</button>
+    </div>
+</div>
+
+
+<script src="http://test.static.huayu.nd/addins/jquery/jquery-2.1.0.js?v=2016040804"></script>
+<script src="http://test.static.huayu.nd/addins/bootstrap/v2.3.1/js/bootstrap.js?v=2016040804"></script>
+<!--<script src="http://test.static.huayu.nd/addins/ko/knockout-3.2.0.js?v=2016040804"></script>-->
+<script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.3.0.js"></script>
+<script src="http://test.static.huayu.nd/addins/ko/knockout.mapping-2.4.1.js?v=2016040804"></script>
+<script src="http://test.static.huayu.nd/addins/jquery/pagination/v2.2/pagination.js?v=2016040804"></script>
+<script>
+    ko.components.register('x-navigation-button', {
+        viewModel: function (params) {
+            var model = this.model = {
+                items: ko.isObservable(params.items) ? params.items : ko.observableArray(params.item),
+                isMultiple: ko.isObservable(params.isMultiple) ? params.isMultiple : ko.observable(params.isMultiple),
+                sizeClass: ko.isObservable(params.sizeClass) ? params.sizeClass : ko.observable(params.sizeClass),
+                colorType: ko.isObservable(params.colorType) ? params.colorType : ko.observable(params.colorType)
+            };
+            this.btnClick = function ($data) {
+                if (model.isMultiple.peek()) {
+                    $data.checked(!$data.checked.peek());
+                }
+                else {
+                    if ($data.checked.peek())
+                        return;
+                    $.each(model.items.peek(), function (index, value) {
+                        if ($data.key.peek() == value.key.peek())
+                            value.checked(true);
+                        else
+                            value.checked(false);
+                    })
+                }
+            }
+        },
+        template: '<!-- ko template: { nodes: $componentTemplateNodes }--><!-- /ko -->'
+    })
+    ko.components.register('x-select-optional', {
+        viewModel: function (params) {
+            var model = this.model = {
+                items: ko.isObservable(params.items) ? params.items : ko.observableArray(params.item)
+            };
+            this.removeClick = function ($index, $data) {
+                model.items.remove($data);
+            }
+        },
+        template: '<!-- ko template: { nodes: $componentTemplateNodes }--><!-- /ko -->'
+    })
+    ko.components.register('x-list-course', {
+        viewModel: function (params) {
+            var model = this.model = {
+                items: ko.isObservable(params.items) ? params.items : ko.observableArray(params.item),
+                selectItems: ko.isObservable(params.selectItems) ? params.selectItems : ko.observableArray(params.selectItems),
+                canChecked: ko.isObservable(params.canChecked) ? params.canChecked : ko.observable(params.canChecked)
+            };
+            var inlineItems = model.items.peek();
+            for (var i = inlineItems.length - 1; i >= 0; i--) {
+                inlineItems[i].customChecked = ko.pureComputed(function () {
+                            if (!this.model.canChecked())
+                                return false;
+
+                            var selectItems = this.model.selectItems();
+                            if (!selectItems)
+                                return false;
+                            for (var i = selectItems.length - 1; i >= 0; i--) {
+                                if (selectItems[i].id() == this.id) {
+                                    return true;
+                                }
+                            }
+                            return false;
+                        }, {
+                            model: model, id: inlineItems[i].id.peek()
+                        }
+                )
+            }
+
+            this.activeClick = function ($index, $data) {
+                var selectItems = model.selectItems.peek();
+                if (!selectItems)
+                    return;
+
+                for (var i = selectItems.length - 1; i >= 0; i--) {
+                    if (selectItems[i].id() == $data.id.peek()) {
+                        model.selectItems.remove(selectItems[i]);
+                        return;
+                    }
+                }
+                model.selectItems.push({
+                    id: ko.observable($data.id.peek()),
+                    title: ko.observable($data.title.peek())
+                });
+            }
+        },
+        template: '<!-- ko template: { nodes: $componentTemplateNodes }--><!-- /ko -->'
+    })
+    var viewModel = {
+        model: {
+            courseType: [{id: 1, text: "公开课", checked: true},
+                {id: 2, text: "培训认证", checked: false},
+                {id: 3, text: "职业规划", checked: false}],
+            secondType: [{key: 1, text: "全部", checked: true},
+                {id: 2, text: "经理例会", checked: false},
+                {id: 3, text: "DJ Talk Show", checked: false},
+                {id: 4, text: "99设计沙龙", checked: false},
+                {id: 5, text: "ND知多少", checked: false},
+                {id: 6, text: "对话部门长", checked: false}],
+            selectedCourse: [{id: 1, title: "DJ脱口秀A"}],
+            CourseList: [{
+                id: 1,
+                title: "DJ脱口秀A",
+                imgUrl: "../image/123.jpg",
+                courseCount: 10,
+                courseHour: 10,
+                courseExam: 10
+            },
+                {
+                    id: 2,
+                    title: "DJ脱口秀B",
+                    imgUrl: "../image/123.jpg",
+                    courseCount: 10,
+                    courseHour: 10,
+                    courseExam: 10
+                },
+                {
+                    id: 3,
+                    title: "DJ脱口秀C",
+                    imgUrl: "../image/123.jpg",
+                    courseCount: 10,
+                    courseHour: 10,
+                    courseExam: 10
+                },
+                {
+                    id: 4,
+                    title: "DJ脱口秀D",
+                    imgUrl: "../image/123.jpg",
+                    courseCount: 10,
+                    courseHour: 10,
+                    courseExam: 10
+                },
+                {
+                    id: 5,
+                    title: "DJ脱口秀E",
+                    imgUrl: "../image/123.jpg",
+                    courseCount: 10,
+                    courseHour: 10,
+                    courseExam: 10
+                },
+                {
+                    id: 6,
+                    title: "DJ脱口秀F",
+                    imgUrl: "../image/123.jpg",
+                    courseCount: 10,
+                    courseHour: 10,
+                    courseExam: 10
+                },
+                {
+                    id: 7,
+                    title: "DJ脱口秀G",
+                    imgUrl: "../image/123.jpg",
+                    courseCount: 10,
+                    courseHour: 10,
+                    courseExam: 10
+                }
+            ]
+        },
+
+        page: function (totalCount, pageIndex, pageSize) {
+            var self = this;
+            $("#pagination").pagination(totalCount, {
+                is_show_first_last: true,
+                is_show_input: true,
+                items_per_page: pageSize,
+                num_display_entries: 5,
+                current_page: pageIndex,
+                prev_text: "上一页",
+                next_text: "下一页",
+                callback: function (index) {
+                    if (index != pageIndex) {
+                        self.model.search.PageIndex(index);
+                        self._getList();
+                    }
+                }
+            });
+        },
+    }
+    var bindViewModel = ko.mapping.fromJS(viewModel);
+    ko.applyBindings(bindViewModel);
+    bindViewModel.page(20, 1, 6);
+</script>
+</body>
+</html>

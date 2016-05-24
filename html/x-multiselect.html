@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="../css/reset.css" type="text/css" rel="stylesheet"/>
+    <link href="../css/x-multiselect.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+外层viewModel：
+<ul class="x-multiselect-box" data-bind="foreach: model.list">
+    <li><span data-bind="text: title"></span><a href="javascript:;"
+                                            data-bind="click: $parent.removeClick.bind($data, $index())">×</a></li>
+</ul>
+<br/>
+components内部viewModel：
+<br/>
+<x-multiselect params="items:model.list">
+    <ul class="x-multiselect-box" data-bind="foreach: model.items">
+        <li><span data-bind="text: title"></span><a href="javascript:;"
+                                                data-bind="click: $parent.removeClick.bind($data, $index())">×</a></li>
+    </ul>
+</x-multiselect>
+<script src="http://test.static.huayu.nd/addins/jquery/jquery-2.1.0.js?v=2016040804"></script>
+<script src="http://test.static.huayu.nd/addins/bootstrap/v2.3.1/js/bootstrap.js?v=2016040804"></script>
+<script src="http://auxo.static.e.local.huayu.nd/auxo/addins/ko/v3.4.0/knockout.min.js?v=2016041801"></script>
+<script src="http://test.static.huayu.nd/addins/ko/knockout.mapping-2.4.1.js?v=2016040804"></script>
+<script>
+    ko.components.register('x-multiselect', {
+        viewModel: function (params) {
+            var model = this.model = {
+                items: ko.isObservable(params.items) ? params.items : ko.observableArray(params.item)
+            };
+            this.removeClick = function ($index, $data) {
+                model.items.remove($data);
+            }
+        },
+        template: '<!-- ko template: { nodes: $componentTemplateNodes }--><!-- /ko -->'
+    })
+    var viewModel = {
+        model: {
+            list: [{id: 1, title: "按钮1"},
+                {id: 2, title: "按钮2"},
+                {id: 3, title: "按钮3"}
+            ]
+        },
+        removeClick: function ($index, $data) {
+            vindViewModel.model.list.remove($data);
+        }
+    }
+    var vindViewModel = ko.mapping.fromJS(viewModel);
+    ko.applyBindings(vindViewModel);
+</script>
+</body>
+</html>

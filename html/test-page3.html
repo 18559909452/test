@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link type="text/css" rel="stylesheet"
+          href="http://test.static.huayu.nd/addins/bootstrap/v2.3.1/css/bootstrap.css?v=2016040804">
+    <link type="text/css" rel="stylesheet"
+          href="http://test.static.huayu.nd/addins/ztree/v3.3/css/ztreestyle/ztreestyle.css?v=2016040804">
+    <link href="../css/x-chooseStudent.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<div id="myModal" class="modal" style="width: 880px; left: 35%;">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 style="font-size: 18px">选择学员</h3>
+    </div>
+    <div class="modal-body" style="max-height: 500px;" data-bind="with: model.info">
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span4" style="border: 1px solid #e5e5e5; padding: 15px 5px 5px 10px; width: 230px; height: 472px;">
+
+                    <label class="radio inline">
+                        <input type="radio" name="studenttype" value="1" data-bind="checked:type">部门
+                    </label>
+                    <label class="radio inline">
+                        <input type="radio" name="studenttype" value="2" data-bind="checked:type">项目
+                    </label>
+                    <label class="radio inline">
+                        <input type="radio" name="studenttype" value="3" data-bind="checked:type">职级
+                    </label>
+                    <ul id="treeDemo" class="ztree"></ul>
+                </div>
+                <div class="span8">
+                    <x-choosestudent params="studentList:studentList, selectStudentList: selectStudentList">
+                        <div class="x-choosestudent-box">
+                            <div class="x-choosestudent-side">
+                                <h4>部门</h4>
+
+                                <div class="x-choosestudent-search">
+                                    <input type="text" placeholder="请输入关键字"
+                                           data-bind="value: model.key, valueUpdate: 'afterkeydown'"/><i
+                                        class="icon-search"></i>
+                                </div>
+                                <ul class="x-choosestudent-studentlist"
+                                    data-bind="foreach: model.studentList, event: { click: function(event, $data) { studentClick(event, $data) } }">
+                                    <li data-bind="css:{ 'x-choosestudent-active': checked }"><i
+                                            class="icon-user icon-white"
+                                            style="background-color: #49afcd; margin: 1px 3px 0 0;"></i><span
+                                            data-bind="text: title">边境</span>
+                                        （<span data-bind="text: id"></span>）
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="x-choosestudent-center">
+                                <div class="x-choosestudent-btnlist">
+                                    <button class="btn" type="button"
+                                            data-bind="click: studentChecked.bind($data, 1, 1)"> ＞＞
+                                    </button>
+                                    <button class="btn" type="button"
+                                            data-bind="click: studentChecked.bind($data, 0, 1)"> ＞
+                                    </button>
+                                    <button class="btn" type="button"
+                                            data-bind="click: studentChecked.bind($data, 0, 0)"> ＜
+                                    </button>
+                                    <button class="btn" type="button"
+                                            data-bind="click: studentChecked.bind($data, 1, 0)"> ＜＜
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="x-choosestudent-side">
+                                <h4>已选成员</h4>
+
+                                <div class="x-choosestudent-search">
+                                    <input type="text" placeholder="请输入关键字"
+                                           data-bind="value: model.selectKey, valueUpdate: 'afterkeydown'"/>
+                                    <i class="icon-search"></i>
+                                </div>
+                                <ul class="x-choosestudent-studentlist"
+                                    data-bind="foreach: model.selectStudentList, event: { click: function(event, $data) { studentClick(event, $data) } }">
+                                    <li data-bind="css:{ 'x-choosestudent-active': checked }"><i
+                                            class="icon-user icon-white"
+                                            style="background-color: #49afcd; margin: 1px 3px 0 0;"></i><span
+                                            data-bind="text: title">边境</span>
+                                        （<span data-bind="text: id"></span>）
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </x-choosestudent>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary">确定</button>
+    </div>
+</div>
+
+
+<script src="http://test.static.huayu.nd/addins/jquery/jquery-1.7.1.min.js?v=2016040804"></script>
+<script src="http://test.static.huayu.nd/addins/bootstrap/v2.3.1/js/bootstrap.js?v=2016040804"></script>
+<script src="http://auxo.static.e.local.huayu.nd/auxo/addins/ko/knockout-3.4.0-min.js?v=2016041801"></script>
+<script src="http://test.static.huayu.nd/addins/ko/knockout.mapping-2.4.1.js?v=2016040804"></script>
+<script src="http://test.static.huayu.nd/addins/ztree/v3.3/js/jquery.ztree.all-3.3.js?v=2016040804"></script>
+<script>
+    ko.components.register('x-choosestudent', {
+        viewModel: function (params) {
+            var model = this.model = {
+                key: ko.observable(""),
+                selectKey: ko.observable(""),
+                studentList: ko.isObservable(params.studentList) ? params.studentList : ko.observableArray(params.studentList),
+                selectStudentList: ko.isObservable(params.selectStudentList) ? params.selectStudentList : ko.observableArray(params.selectStudentList)
+            };
+            this.activeClick = function ($index, event, $data) {
+                var bl = $(event.currentTarget).hasClass("x-courselist-active");
+                var selectItems = model.selectItems.peek();
+                if (!selectItems)
+                    return;
+                if (!bl) {
+                    model.selectItems.push({
+                        id: ko.observable($data.id.peek()),
+                        title: ko.observable($data.title.peek())
+                    });
+                    return
+                }
+                for (var i = selectItems.length - 1; i >= 0; i--) {
+                    if (selectItems[i].id() == $data.id.peek()) {
+                        model.selectItems.remove(selectItems[i]);
+                    }
+                }
+                model.selectItems.valueHasMutated();
+            }
+
+            this.studentClick = function ($data, event) {
+                var target = event.target, node;
+                if (target.parentNode.tagName == "LI")
+                    node = target.parentNode;
+                else if (target.tagName == "LI")
+                    node = target;
+                var bindingContext = ko.contextFor(node);
+                var aa = $(node).closest("div");
+                bindingContext.$data.checked(bindingContext.$data.checked.peek());
+                if (!event.ctrlKey) {
+                    $.each(bindingContext.$parent.model.studentList.peek(), function (index, value) {
+                        value.checked(false);
+                    })
+                    bindingContext.$data.checked(true);
+                }
+                else {
+                    bindingContext.$data.checked(!bindingContext.$data.checked.peek());
+                }
+            }
+
+            this.searchStudent = function (val, timer, list) {
+                clearTimeout(timer.id);
+                timer.id = setTimeout(function () {
+                    if (!val) {
+                        $.each(list, function (index, value) {
+                            value.checked(false);
+                        })
+                        return;
+                    }
+                    $.each(list, function (index, value) {
+                        if (!val || (value.title().indexOf(val) < 0 && value.id().toString().indexOf(val) < 0))
+                            value.checked(false);
+                        else
+                            value.checked(true);
+                    })
+                    var node = $(".span3 li[class*='active']:first");
+                    var parent = node.closest("ul");
+                    if (node.length > 0)
+                        parent.scrollTop(node.position().top + parent.scrollTop() + 3);
+                }, 500);
+            }
+
+            this.studentChecked = function (type, mode, $data) {
+                var info = model,
+                        studentList = mode == 1 ? info.studentList : info.selectStudentList,
+                        selectStudentList = mode == 1 ? info.selectStudentList : info.studentList,
+                        oldList = [], newList = [];
+                $.each(studentList.peek(), function (index, value) {
+                    if (type == 1 || value.checked.peek()) {
+                        value.checked(false);
+                        newList.push(value);
+                    } else
+                        oldList.push(value);
+                })
+                studentList(oldList);
+                selectStudentList(selectStudentList.peek().concat(newList));
+            }
+
+            model.key.subscribe((function () {
+                var timer = {id: undefined};
+                return function (val) {
+                    this.searchStudent(val, timer, this.model.studentList.peek());
+                }
+            }()), this);
+
+            model.selectKey.subscribe((function () {
+                var timer = {id: undefined};
+                return function (val) {
+                    this.searchStudent(val, timer, this.model.selectStudentList.peek());
+                }
+            }()), this);
+        },
+        template: '<!-- ko template: { nodes: $componentTemplateNodes }--><!-- /ko -->'
+    })
+
+    var viewModel = {
+
+        model: {
+            info: {
+                type: 1,
+                studentList: [{id: 111, title: "学员A", checked: false}, {
+                    id: 122,
+                    title: "学员B",
+                    checked: false
+                }, {id: 123, title: "学员C", checked: false}, {id: 111, title: "学员A", checked: false}, {
+                    id: 122,
+                    title: "学员B",
+                    checked: false
+                }, {id: 123, title: "学员C", checked: false}, {id: 111, title: "学员A", checked: false}, {
+                    id: 122,
+                    title: "学员B",
+                    checked: false
+                }, {id: 123, title: "学员C", checked: false}, {id: 111, title: "学员A", checked: false}, {
+                    id: 122,
+                    title: "学员B",
+                    checked: false
+                }, {id: 123, title: "学员C", checked: false}, {id: 111, title: "学员A", checked: false}, {
+                    id: 122,
+                    title: "学员B",
+                    checked: false
+                }, {id: 123, title: "学员C", checked: false}, {id: 444, title: "学员A", checked: false}, {
+                    id: 122,
+                    title: "学员B",
+                    checked: false
+                }, {id: 123, title: "学员C", checked: false}, {id: 111, title: "学员A", checked: false}, {
+                    id: 122,
+                    title: "学员B",
+                    checked: false
+                }, {id: 123, title: "学员C", checked: false}, {id: 111, title: "学员A", checked: false}, {
+                    id: 122,
+                    title: "学员B",
+                    checked: false
+                }, {id: 555, title: "学员C", checked: false}, {id: 111, title: "学员A", checked: false}, {
+                    id: 122,
+                    title: "学员B",
+                    checked: false
+                }, {id: 123, title: "学员C", checked: false}, {id: 111, title: "学员A", checked: false}, {
+                    id: 122,
+                    title: "学员B",
+                    checked: false
+                }, {id: 123, title: "学员C", checked: false}],
+                selectStudentList: [{id: 111, title: "学员A", checked: false}, {
+                    id: 122,
+                    title: "学员B",
+                    checked: false
+                }, {id: 123, title: "学员C", checked: false}]
+            }
+        },
+
+        initzTree: function () {
+            var setting = {
+                view: {
+                    selectedMulti: false
+                }
+            };
+
+            var zNodes = [
+                {
+                    name: "父节点1 - 展开", open: true,
+                    children: [
+                        {
+                            name: "父节点11 - 折叠",
+                            children: [
+                                {name: "叶子节点111"},
+                                {name: "叶子节点112"},
+                                {name: "叶子节点113"},
+                                {name: "叶子节点114"}
+                            ]
+                        },
+                        {
+                            name: "父节点12 - 折叠",
+                            children: [
+                                {name: "叶子节点121"},
+                                {name: "叶子节点122"},
+                                {name: "叶子节点123"},
+                                {name: "叶子节点124"}
+                            ]
+                        },
+                        {name: "父节点13 - 没有子节点", isParent: true}
+                    ]
+                },
+                {
+                    name: "父节点2 - 折叠",
+                    children: [
+                        {
+                            name: "父节点21 - 展开", open: true,
+                            children: [
+                                {name: "叶子节点211"},
+                                {name: "叶子节点212"},
+                                {name: "叶子节点213"},
+                                {name: "叶子节点214"}
+                            ]
+                        },
+                        {
+                            name: "父节点22 - 折叠",
+                            children: [
+                                {name: "叶子节点221"},
+                                {name: "叶子节点222"},
+                                {name: "叶子节点223"},
+                                {name: "叶子节点224"}
+                            ]
+                        },
+                        {
+                            name: "父节点23 - 折叠",
+                            children: [
+                                {name: "叶子节点231"},
+                                {name: "叶子节点232"},
+                                {name: "叶子节点233"},
+                                {name: "叶子节点234"}
+                            ]
+                        }
+                    ]
+                },
+                {name: "父节点3 - 没有子节点", isParent: true}
+
+            ];
+
+
+            $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+        }
+    }
+    var bindViewModel = ko.mapping.fromJS(viewModel);
+
+
+    ko.applyBindings(bindViewModel);
+    bindViewModel.initzTree();
+</script>
+</body>
+</html>

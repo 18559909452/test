@@ -1,0 +1,67 @@
+%clearfix{
+    *zoom:1;        // for IE6,7
+    &:after{
+        content: '';
+        height: 0;
+        visibility: hidden;
+        display: block;
+        clear: both;
+    }
+}
+
+%ellipse {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+%inline-block {
+    display: inline-block;
+    *vertical-align: auto; // fixed IE7 inline-block
+    zoom: 1;
+    *display: inline;
+}
+
+%img-hover {
+    transform: scale(1.2);
+    -o-transform: scale(1.2);
+    -ms-transform: scale(1.2);
+    -moz-transform: scale(1.2);
+    -webkit-transform: scale(1.2);
+}
+
+@mixin fadeIn($time){
+    display: block;
+    -webkit-animation: fadeIn #{$time}s linear forwards;
+    -moz-animation: fadeIn #{$time}s linear forwards;
+    -ms-animation: fadeIn #{$time}s linear forwards;
+    -o-animation: fadeIn #{$time}s linear forwards;
+    animation: fadeIn #{$time}s linear forwards;
+}
+
+%fadeIn {
+    display: block;
+    -webkit-animation: fadeIn .6s linear forwards;
+    -moz-animation: fadeIn .6s linear forwards;
+    -ms-animation: fadeIn .6s linear forwards;
+    -o-animation: fadeIn .6s linear forwards;
+    animation: fadeIn .6s linear forwards;
+}
+
+
+@-webkit-keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+@-moz-keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+@-o-keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}

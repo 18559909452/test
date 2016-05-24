@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link type="text/css" rel="stylesheet"
+          href="http://test.static.huayu.nd/addins/bootstrap/v2.3.1/css/bootstrap.css?v=2016040804">
+</head>
+<body>
+外层viewModel：
+<br/>
+
+<div class="btn-group" style="margin: 9px 0 5px;" data-bind="foreach: model.list, visible: model.list().length>0"
+     style="display: none;">
+    <button class="btn"
+            data-bind="css: 'btn '+ $parent.model.sizeClass() + ' ' + (checked() ? $parent.model.colorType() : ''), text: text, click: $parent.btnClick.bind($data)"></button>
+</div>
+<select class="input-medium" style="margin: 9px 0 5px;" data-bind="value: model.colorType">
+    <option value="btn-primary">btn-primary</option>
+    <option value="btn-info">btn-info</option>
+    <option value="btn-success">btn-success</option>
+    <option value="btn-warning">btn-warning</option>
+    <option value="btn-danger">btn-danger</option>
+    <option value="btn-inverse">btn-inverse</option>
+</select>
+<select class="input-medium" style="margin: 9px 0 5px;" data-bind="value: model.sizeClass">
+    <option value="btn-large">btn-large</option>
+    <option value="">默认</option>
+    <option value="btn-small">btn-small</option>
+    <option value="btn-mini">btn-mini</option>
+</select>
+<br/>
+components内部viewModel：
+<br/>
+<x-btngroup
+        params="items:model.list, isMultiple:model.isMultiple">
+    <div class="btn-group" style="margin: 9px 0 5px;" data-bind="foreach: model.items, visible: model.items().length>0"
+         style="display: none;">
+        <button data-bind="css: 'btn '+ $parent.model.sizeClass() + ' ' + (checked() ? $parent.model.colorType() : ''), text: text, click: $parent.btnClick.bind($data)"></button>
+    </div>
+    <select class="input-medium" style="margin: 9px 0 5px;" data-bind="value: model.colorType">
+        <option value="btn-primary">btn-primary</option>
+        <option value="btn-info">btn-info</option>
+        <option value="btn-success">btn-success</option>
+        <option value="btn-warning">btn-warning</option>
+        <option value="btn-danger">btn-danger</option>
+        <option value="btn-inverse">btn-inverse</option>
+    </select>
+    <select class="input-medium" style="margin: 9px 0 5px;" data-bind="value: model.sizeClass">
+        <option value="btn-large">btn-large</option>
+        <option value="">默认</option>
+        <option value="btn-small">btn-small</option>
+        <option value="btn-mini">btn-mini</option>
+    </select>
+</x-btngroup>
+
+
+<script src="http://test.static.huayu.nd/addins/jquery/jquery-2.1.0.js?v=2016040804"></script>
+<script src="http://test.static.huayu.nd/addins/bootstrap/v2.3.1/js/bootstrap.js?v=2016040804"></script>
+<script src="http://auxo.static.e.local.huayu.nd/auxo/addins/ko/knockout-3.4.0-min.js?v=2016041801"></script>
+<script src="http://test.static.huayu.nd/addins/ko/knockout.mapping-2.4.1.js?v=2016040804"></script>
+<script>
+    ko.components.register('x-btngroup', {
+        viewModel: function (params) {
+            var model = this.model = {
+                items: ko.isObservable(params.items) ? params.items : ko.observableArray(params.item),
+                isMultiple: ko.isObservable(params.isMultiple) ? params.isMultiple : ko.observable(params.isMultiple),
+                sizeClass: ko.isObservable(params.sizeClass) ? params.sizeClass : ko.observable(params.sizeClass),
+                colorType: ko.isObservable(params.colorType) ? params.colorType : ko.observable(params.colorType)
+            };
+            this.btnClick = function ($data) {
+                if (model.isMultiple.peek()) {
+                    $data.checked(!$data.checked.peek());
+                }
+                else {
+                    if ($data.checked.peek())
+                        return;
+                    $.each(model.items.peek(), function (index, value) {
+                        if ($data.key.peek() == value.key.peek())
+                            value.checked(true);
+                        else
+                            value.checked(false);
+                    })
+                }
+            }
+        },
+        template: '<!-- ko template: { nodes: $componentTemplateNodes }--><!-- /ko -->'
+    })
+    var viewModel = {
+        model: {
+            sizeClass: "",
+            colorType: "btn-primary",
+            isMultiple: true,
+            list: [{key: 1, text: "按钮1", checked: true},
+                {key: 2, text: "按钮2", checked: false},
+                {key: 3, text: "按钮3", checked: false}
+            ]
+        },
+        btnClick: function ($data) {
+            if (vindViewModel.model.isMultiple.peek()) {
+                $data.checked(!$data.checked.peek());
+            }
+            else {
+                if ($data.checked.peek())
+                    return;
+                $.each(vindViewModel.model.list.peek(), function (index, value) {
+                    if ($data.key.peek() == value.key.peek())
+                        value.checked(true);
+                    else
+                        value.checked(false);
+                })
+            }
+        }
+    }
+    var vindViewModel = ko.mapping.fromJS(viewModel);
+    ko.applyBindings(vindViewModel);
+</script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="../css/reset.css" type="text/css" rel="stylesheet"/>
+    <link href="../css/x-courselist.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+外层viewModel：
+<ul class="x-courselist-box" data-bind="foreach: model.list, visible: model.list().length>0" style="display: none;">
+    <li data-bind="css:{ 'x-courselist-active': checked() }, click: $parent.activeClick.bind($data, $index())">
+        <i></i>
+        <img src data-bind="attr:{'src': imgUrl }">
+
+        <p data-bind="text:title"></p>
+        <ul class="x-courselist-detail">
+            <li><span data-bind="text: courseCount"></span>门课程</li>
+            <li><span class="x-courselist-split">|</span></li>
+            <li><span data-bind="text: courseHour">1</span>学时</li>
+            <li><span class="x-courselist-split">|</span></li>
+            <li><span data-bind="x-courselist-split: courseExam">1</span>个考试</li>
+        </ul>
+    </li>
+</ul>
+<br/>
+components内部viewModel：
+<br/>
+<x-courselist params="items:model.list, selectItems: [], canChecked: true">
+    <ul class="x-courselist-box" data-bind="foreach: model.items, visible: model.items().length>0"
+        style="display: none;">
+        <li data-bind="css:{ 'x-courselist-active': customChecked }, event: { click: $parent.activeClick.bind($data, $index(), event) }">
+            <i></i>
+            <img src data-bind="attr:{'src': imgUrl }">
+
+            <div>
+                <span class="x-courselist-state">上线</span>
+                <p data-bind="text:title"></p>
+            </div>
+            <ul class="x-courselist-detail">
+                <li><span data-bind="text: courseCount"></span>门课程</li>
+                <li><span class="x-courselist-split">|</span></li>
+                <li><span data-bind="text: courseHour">1</span>学时</li>
+                <li><span class="x-courselist-split">|</span></li>
+                <li><span data-bind="text: courseExam">1</span>个考试</li>
+            </ul>
+        </li>
+    </ul>
+</x-courselist>
+<script src="http://test.static.huayu.nd/addins/jquery/jquery-2.1.0.js?v=2016040804"></script>
+<script src="http://test.static.huayu.nd/addins/bootstrap/v2.3.1/js/bootstrap.js?v=2016040804"></script>
+<script src="http://static.e.dev.huayu.nd/auxo/addins/ko/v3.4.0/knockout.min.js?v=2016-05-12T07:13:01Z"></script>
+<script src="http://test.static.huayu.nd/addins/ko/knockout.mapping-2.4.1.js?v=2016040804"></script>
+<script>
+    ko.components.register('x-courselist', {
+        viewModel: function (params) {
+            var model = this.model = {
+                items: ko.isObservable(params.items) ? params.items : ko.observableArray(params.item),
+                selectItems: ko.isObservable(params.selectItems) ? params.selectItems : ko.observableArray(params.selectItems),
+                canChecked: ko.isObservable(params.canChecked) ? params.canChecked : ko.observable(params.canChecked)
+            };
+
+            var inlineItems = model.items.peek();
+            for (var i = inlineItems.length - 1; i >= 0; i--) {
+                inlineItems[i].customChecked = ko.pureComputed(function () {
+                            if (!this.model.canChecked())
+                                return false;
+
+                            var selectItems = this.model.selectItems();
+                            if (!selectItems)
+                                return false;
+                            for (var i = selectItems.length - 1; i >= 0; i--) {
+                                if (selectItems[i].id() == this.id) {
+                                    return true;
+                                }
+                            }
+                            return false;
+                        }, {
+                            model: model, id: inlineItems[i].id.peek()
+                        }
+                )
+            }
+
+            this.activeClick = function ($index, event, $data) {
+                var bl = $(event.currentTarget).hasClass("x-courselist-active");
+                var selectItems = model.selectItems.peek();
+                if (!selectItems)
+                    return;
+                if (!bl) {
+                    model.selectItems.push({
+                        id: ko.observable($data.id.peek()),
+                        title: ko.observable($data.title.peek())
+                    });
+                    return
+                }
+                for (var i = selectItems.length - 1; i >= 0; i--) {
+                    if (selectItems[i].id() == $data.id.peek()) {
+                        model.selectItems.remove(selectItems[i]);
+                    }
+                }
+                model.selectItems.valueHasMutated();
+            }
+        },
+        template: '<!-- ko template: { nodes: $componentTemplateNodes }--><!-- /ko -->'
+    })
+    var viewModel = {
+        model: {
+            list: [{
+                id: 1,
+                title: "DJ脱口秀A",
+                imgUrl: "../image/123.jpg",
+                courseCount: 10,
+                courseHour: 10,
+                courseExam: 10,
+                checked: true
+            },
+                {
+                    id: 2,
+                    title: "DJ脱口秀B",
+                    imgUrl: "../image/123.jpg",
+                    courseCount: 10,
+                    courseHour: 10,
+                    courseExam: 10,
+                    checked: false
+                },
+                {
+                    id: 3,
+                    title: "DJ脱口秀C",
+                    imgUrl: "../image/123.jpg",
+                    courseCount: 10,
+                    courseHour: 10,
+                    courseExam: 10,
+                    checked: false
+                }
+            ]
+        },
+        activeClick: function ($index, $data) {
+            $data.checked(!$data.checked.peek());
+        }
+    }
+    var vindViewModel = ko.mapping.fromJS(viewModel);
+    ko.applyBindings(vindViewModel);
+</script>
+</body>
+</html>

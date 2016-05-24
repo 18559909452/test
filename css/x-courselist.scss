@@ -1,0 +1,76 @@
+@import "assist.scss";
+
+.x-courselist-box,
+.x-courselist-detail {
+  margin: 0;
+
+  list-style: none;
+  @extend %clearfix;
+  li {
+    cursor: pointer;
+    float: left;
+  }
+}
+
+.x-courselist-box {
+  & > li {
+    position: relative;
+    margin: 0 20px;
+    width: 200px;
+    border: 2px solid #e5e5e5;
+    margin-bottom: 12px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    & > i {
+      position: absolute;
+      display: none;
+      top: 50px;
+      left: 70px;
+      width: 56px;
+      height: 56px;
+      background: url("../image/courselist.png") -330px 0px no-repeat;
+    }
+    &.x-courselist-active {
+      border: 2px solid #49afcd;
+      & > i {
+        display: block;
+      }
+    }
+    img {
+      width: 200px;
+      height: 120px;
+    }
+    p {
+      padding: 0 5px;
+      font: 16px/1.5 "microsoft yahei";
+      @extend %ellipse;
+      margin-bottom: 5px;
+    }
+    .x-courselist-state {
+      float: right;
+      padding: 3px 5px 0 5px;
+      font: 15px/1.2 "microsoft yahei";
+    }
+
+    .x-courselist-active {
+      color: #08c;
+    }
+
+    .x-courselist-detail {
+      padding: 0 5px 5px 5px;
+      & > li {
+        span {
+          font: 10px/1.2 "microsoft yahei";
+          margin: 0 2px;
+          color: #08c;
+        }
+        .x-courselist-split {
+          margin: 0 5px;
+          color: #e5e5e5;
+          font: 12px/12px "microsoft yahei";
+        }
+      }
+    }
+  }
+}
