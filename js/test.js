@@ -1,6 +1,7 @@
 (function () {
+    "use strict";
     var duck = {
-        duckSinging: function(){
+        duckSing1ing: function(){
             console.log("嘎嘎嘎");
         }
     }
