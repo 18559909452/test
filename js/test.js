@@ -1,4 +1,5 @@
 (function () {
+    "use strict";
     var duck = {
         duckSing2ing: function(){
             console.log("嘎嘎嘎");
